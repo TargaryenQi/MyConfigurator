@@ -1,2 +1,0 @@
-# MyConfigurator
-Created with CodeSandbox
