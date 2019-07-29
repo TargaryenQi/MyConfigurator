@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
+import { ConfiguratorContext } from "../../contexts/configurator.context";
 import { makeStyles } from "@material-ui/core/styles";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepButton from "@material-ui/core/StepButton";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
+import {
+  Stepper,
+  Step,
+  StepButton,
+  Button,
+  Typography
+} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -26,13 +29,16 @@ function getSubstepDescription(steps, index) {
   return `Substep ${index + 1} : ${steps[index].description}`;
 }
 
-export default ({ subSteps }) => {
+export default props => {
+  const configurations = useContext(ConfiguratorContext);
+  const substeps = configurations.substeps;
+
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
 
   function totalSteps() {
-    return subSteps.length;
+    return substeps.length;
   }
 
   function completedSteps() {
@@ -52,7 +58,7 @@ export default ({ subSteps }) => {
       isLastStep() && !allStepsCompleted()
         ? // It's the last step, but not all steps have been completed,
           // find the first step that has been completed
-          subSteps.findIndex((step, i) => !(i in completed))
+          substeps.findIndex((step, i) => !(i in completed))
         : activeStep + 1;
     setActiveStep(newActiveStep);
   }
@@ -80,13 +86,13 @@ export default ({ subSteps }) => {
   return (
     <div className={classes.root}>
       <Stepper nonLinear activeStep={activeStep}>
-        {subSteps.map((subStep, index) => (
-          <Step key={subStep.id}>
+        {substeps.map((substep, index) => (
+          <Step key={substep.id}>
             <StepButton
               onClick={handleStep(index)}
               completed={completed[index]}
             >
-              {subStep.title}
+              {substep.title}
             </StepButton>
           </Step>
         ))}
@@ -111,7 +117,7 @@ export default ({ subSteps }) => {
         ) : (
           <div>
             <Typography className={classes.instructions}>
-              {getSubstepDescription(subSteps, activeStep)}
+              {getSubstepDescription(substeps, activeStep)}
             </Typography>
             <div>
               <Button
@@ -129,7 +135,7 @@ export default ({ subSteps }) => {
               >
                 Next
               </Button>
-              {activeStep !== subSteps.length &&
+              {activeStep !== substeps.length &&
                 (completed[activeStep] ? (
                   <Typography variant="caption" className={classes.completed}>
                     Step {activeStep + 1} already completed

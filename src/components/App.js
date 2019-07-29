@@ -1,15 +1,17 @@
 import React, { Component, Fragment } from "react";
 import { Header, Footer } from "./Layout";
 import Body from "./Body/index";
-import { steps, subSteps } from "../Store";
+import { ConfiguratorProvider } from "../contexts/configurator.context";
 
 export default class extends Component {
   render() {
     return (
       <Fragment>
         <Header />
-        <Body subSteps={subSteps} />
-        <Footer steps={steps} />
+        <ConfiguratorProvider>
+          <Body />
+          <Footer />
+        </ConfiguratorProvider>
       </Fragment>
     );
   }

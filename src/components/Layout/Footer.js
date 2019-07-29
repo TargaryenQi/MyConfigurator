@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { ConfiguratorContext } from "../../contexts/configurator.context";
 import { Paper, Tabs, Tab } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -8,9 +9,12 @@ const useStyles = makeStyles({
   }
 });
 
-export default ({ steps }) => {
+export default props => {
+  const configurations = useContext(ConfiguratorContext);
+  const steps = configurations.steps;
+  const currentStep = configurations.currentStep;
   const classes = useStyles();
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(currentStep);
 
   function handleChange(event, newValue) {
     setValue(newValue);
