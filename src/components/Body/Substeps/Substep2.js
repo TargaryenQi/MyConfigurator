@@ -15,7 +15,7 @@ export default props => {
   const [isTwoD, toggle] = useToggleState(true);
   return (
     <Grid container xs="12">
-      <Grid item xs="5">
+      <Grid item xs="4">
         <Card>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>

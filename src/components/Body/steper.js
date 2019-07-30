@@ -1,17 +1,21 @@
 import React, { useContext } from "react";
-import { ConfiguratorContext } from "../../contexts/configurator.context";
+import {
+  ConfiguratorContext,
+  DispatchContext
+} from "../../contexts/configurator.context";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Stepper,
   Step,
   StepButton,
   Button,
-  Typography
+  Typography,
+  Grid
 } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: "90%"
+    width: "100%"
   },
   button: {
     marginRight: theme.spacing(1)
@@ -32,10 +36,12 @@ function getSubstepDescription(steps, index) {
 export default props => {
   const configurations = useContext(ConfiguratorContext);
   const substeps = configurations.substeps;
-
+  const currentSubstep = configurations.currentSubstep;
+  const currentStep = configurations.currentStep;
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
+  const dispatch = useContext(DispatchContext);
 
   function totalSteps() {
     return substeps.length;
@@ -61,10 +67,12 @@ export default props => {
           substeps.findIndex((step, i) => !(i in completed))
         : activeStep + 1;
     setActiveStep(newActiveStep);
+    dispatch({ type: "NEXTSUBSTEP" });
   }
 
   function handleBack() {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
+    dispatch({ type: "LASTSUBSTEP" });
   }
 
   const handleStep = step => () => {
@@ -81,7 +89,20 @@ export default props => {
   function handleReset() {
     setActiveStep(0);
     setCompleted({});
+    dispatch({ type: "RESET" });
   }
+
+  function handleNextStep() {
+    if (currentStep !== 2) {
+      dispatch({ type: "NEXTSTEP" });
+      handleReset();
+    } else {
+      window.alert("This is already the final step!");
+    }
+  }
+  console.log(`active${activeStep}`);
+  console.log(`current${currentSubstep}`);
+  console.log(`currentStep${currentStep}`);
 
   return (
     <div className={classes.root}>
@@ -89,7 +110,7 @@ export default props => {
         {substeps.map((substep, index) => (
           <Step key={substep.id}>
             <StepButton
-              onClick={handleStep(index)}
+              // onClick={handleStep(index)}
               completed={completed[index]}
             >
               {substep.title}
@@ -99,27 +120,34 @@ export default props => {
       </Stepper>
       <div>
         {allStepsCompleted() ? (
-          <div>
-            <Typography className={classes.instructions}>
-              All substeps completed!
-            </Typography>
-            <Button onClick={handleReset} className={classes.button}>
-              Reset
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.button}
-            >
-              Go To Next Step
-            </Button>
-          </div>
+          <Grid container xs="12">
+            <Grid item xs="8">
+              <Typography className={classes.instructions}>
+                All substeps completed!
+              </Typography>
+            </Grid>
+            <Grid item xs="4">
+              <Button onClick={handleReset} className={classes.button}>
+                Reset
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={handleNextStep}
+              >
+                Go To Next Step
+              </Button>
+            </Grid>
+          </Grid>
         ) : (
-          <div>
-            <Typography className={classes.instructions}>
-              {getSubstepDescription(substeps, activeStep)}
-            </Typography>
-            <div>
+          <Grid container xs="12">
+            <Grid item xs="8">
+              <Typography className={classes.instructions}>
+                {getSubstepDescription(substeps, activeStep)}
+              </Typography>
+            </Grid>
+            <Grid item xs="4">
               <Button
                 disabled={activeStep === 0}
                 onClick={handleBack}
@@ -151,8 +179,8 @@ export default props => {
                       : "Complete Step"}
                   </Button>
                 ))}
-            </div>
-          </div>
+            </Grid>
+          </Grid>
         )}
       </div>
     </div>
